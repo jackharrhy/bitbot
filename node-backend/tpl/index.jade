@@ -1,0 +1,25 @@
+doctype
+html
+	head
+		title= "Robot | Jack, David, & Tyler"
+		link(rel="stylesheet", href="node-backend.css")
+
+	body
+		#topLeft
+			#inputSelector(onclick="usingJS = !usingJS")
+				p S
+			#iCanvasContainer
+				canvas#iCanvas
+
+		#topRight
+			img(src="http://192.168.2.51:81/?action=stream")
+
+		#bottomLeft
+
+		#bottomRight
+
+		#centerPiece
+
+		script(src="socket.io/socket.io.js")
+		script(src="interact.min.js")
+		script(src="node-backend.js")
