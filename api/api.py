@@ -3,21 +3,8 @@
 PORT = 1337
 
 print("""
-           Jack 'n' David 'n' Tyler's
-
-  ,ggggggggggg,
-  dP\"\"\"88\"\"\"\"\"\"Y8,              ,dPYb,                I8
-  Yb,  88      `8b              IP'`Yb                I8
-   `\"  88      ,8P              I8  8I             88888888
-       88aaaad8P"               I8  8'                I8
-       88\"\"\"\"Yb,      ,ggggg,   I8 dP       ,ggggg,   I8
-       88     \"8b    dP\"  \"Y8gggI8dP   88ggdP\"  \"Y8gggI8
-       88      `8i  i8'    ,8I  I8P    8I i8'    ,8I ,I8,
-       88       Yb,,d8,   ,d8' ,d8b,  ,8I,d8,   ,d8',d88b,
-       88        Y8P"Y8888P"   8P'"Y88P"'P"Y8888P"  8P""Y8
-
-API @ ::"""+str(PORT)+"""
-------------
+API @ :"""+str(PORT)+"""
+-----------
 """)
 
 from ctypes import *
@@ -33,36 +20,24 @@ from Phidgets.Manager import Manager
 from Phidgets.Devices import *
 from Phidgets.Phidget import PhidgetLogLevel
 
-def moveRobot(dir, time, speed):
+delay = 0.05
+
+def handleRequest(axis, amount):
     try:
-        ti.sleep(float(time))
+        ti.sleep(delay)
     except KeyboardInterrupt:
         quit()
 
-    resp = dir + '\n' + str(time) + 's\n' + str(speed)
-    return time
-
-def rotateRobot(degree):
-    return degree
+    print(axis, amount)
 
 class webHandle(resource.Resource):
     isLeaf = True
     def render_GET(self, request):
-        print("[@] Web Reques on " +str(request.uri)+ ", loop #"+str(n))
+        #print("[@] Web Reques on " +str(request.uri)+ ", loop #"+str(n))
 
         url = request.uri.split('/')
-        print(url)
 
-        if url[1] == "status":
-            return str(manager.isAttachedToServer())
-        elif url[1] == "f":
-            return moveRobot("f", url[2], url[3])
-        elif url[1] == "b":
-            return moveRobot("b", url[2], url[3])
-        elif url[1] == "turn":
-            return rotateRobot(url[2])
-        else:
-            return request.uri + " is an invalid url"
+        handleRequest(url[1], url[2])
 
         return str(n)
 

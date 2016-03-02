@@ -3,16 +3,16 @@ var request = require('request');
 var express = require('express');
 var app = express();
 
-/*
 var joystick = new (require('joystick'))(0, 100, 10);
-
-joystick.on('button', function(button) {
-	io.emit('button', button);
+var button = [0,0,0,0,0,0,0,0,0,0,0];
+joystick.on('button', function(rawButton) {
+	io.sockets.emit('button', 
+	button[rawButton.number] = rawButton.value;
 });
-joystick.on('axis', function(axis) {
-	io.emit('axis', axis);
+var axis = [0,0,0];
+joystick.on('axis', function(rawAxis) {
+	axis[rawAxis.number] = rawAxis.value / 32767;
 });
-*/
 
 app.use(express.static(__dirname + '/static'));
 
@@ -24,47 +24,49 @@ app.get('/', function(req, res){
 	res.render('index');
 });
 
-app.get('/otto', function(req, res){
-	res.render('otto');
-});
-
 var io = require('socket.io').listen(app.listen(80));
 
 var canRequest = true;
-function url(d,t,s) {
+function url(curAxis, axisValue) {
+	console.log(curAxis, axisValue);
+	if(canRequest) {
+		request('http://localhost:1337/'+curAxis+'/'+axisValue,
+						function(e,r,b) {
+							canRequest = true;			 
+						});
+	}
 	canRequest = false;
-	request('http://localhost:1337/'+d+'/'+String(t)+'/'+String(s),
-					function(e,r,b) {
-						canRequest = true;			 
-					});
 }
 
-function parseClientUpdate(axis, button) {
-	if(axis[0] > 0.25) {
-		url('f', 0.25, axis[0]);
-	} else if(axis[0] < -0.25) {
-		
+var urlSwitch = false;
+function updateAPI() {
+	urlSwitch = !urlSwitch;
+
+	if(urlSwitch) {
+		if(axis[1] < -0.01) {
+			url(1, axis[1]);
+		} else if(axis[1] > 0.01) {
+			url(1, axis[1]);
+		}
 	}
+
+	if(axis[0] < -0.01) {
+		url(0, axis[0]);
+	} else if(axis[0] > 0.01) {
+		url(0, axis[0]);
+	}
+
+	setTimeout(updateAPI, 100);
+
+	//console.log(axis, button);
 }
+updateAPI();
 
 io.sockets.on('connection', function (socket) {
-	socket.on('client-update', function(data) {
-		parseClientUpdate(data.axis, data.button);
+	socket.on('something', function(data) {
+		//
 	});
 });
 
-console.log("\n\
-\
-            Jack'n' David 'n' Tyler's\n\
-\
-      .-.              .               \n\
-      (_) )-.        /           /   \n\
-      /   \\  .-._. /-.  .-._.---/--- \n\
-     /     )(   ) /   )(   )   /     \n\
-  .-/ ----'  `-'.'`--'`-`-'   /      \n\
- (_/     `-._)   \n\
-\n\
-Web Interface @ ::80\n\
---------------------\n\
-\
-");
+console.log("============================");
+console.log("Web Interface @ 127.0.0.1:80");
