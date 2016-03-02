@@ -3,7 +3,6 @@ var request = require('request');
 var express = require('express');
 var app = express();
 
-/*
 var joystick = new (require('joystick'))(0, 100, 10);
 
 joystick.on('button', function(button) {
@@ -12,7 +11,6 @@ joystick.on('button', function(button) {
 joystick.on('axis', function(axis) {
 	io.emit('axis', axis);
 });
-*/
 
 app.use(express.static(__dirname + '/static'));
 
