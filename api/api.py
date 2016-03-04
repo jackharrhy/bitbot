@@ -2,10 +2,7 @@
 
 PORT = 1337
 
-print("""
-API @ :"""+str(PORT)+"""
------------
-""")
+print("Jack, David, & Tyler's Robot\n")
 
 from ctypes import *
 import sys, os
@@ -22,7 +19,18 @@ from Phidgets.Phidget import PhidgetLogLevel
 
 delay = 0.05
 
-def handleRequest(axis, amount):
+def turn(amount):
+    pass
+
+def move(amount):
+    pass
+
+def handleAxisReq(axis, amount):
+    if axis == 0:
+        turn(amount)
+    else:
+        move(amount)
+
     try:
         ti.sleep(delay)
     except KeyboardInterrupt:
@@ -30,14 +38,24 @@ def handleRequest(axis, amount):
 
     print(axis, amount)
 
+def handleButtonReq(button):
+    try:
+        ti.sleep(delay)
+    except KeyboardInterrupt:
+        quit()
+
+    print(button)
+
 class webHandle(resource.Resource):
     isLeaf = True
     def render_GET(self, request):
-        #print("[@] Web Reques on " +str(request.uri)+ ", loop #"+str(n))
+        print("[@] Web Reques on " +str(request.uri)+ ", loop #"+str(n))
 
         url = request.uri.split('/')
-
-        handleRequest(url[1], url[2])
+        if url[1] == 'axis':
+            handleAxisReq(url[2], url[3])
+        else:
+            handleButtonReq(url[2])
 
         return str(n)
 
@@ -82,9 +100,12 @@ try:
 except PhidgetException as e: LocalErrorCatcher(e)
 
 try:
-    manager.openRemoteIP("192.168.2.51", 5001)
+    pass
+    #manager.openRemoteIP("192.168.2.51", 5001)
 except PhidgetException as e: LocalErrorCatcher(e)
 
+print("API @ :"+str(PORT))
+print("-----------\n")
 print("[#] Starting loop...")
 try:
     while True:

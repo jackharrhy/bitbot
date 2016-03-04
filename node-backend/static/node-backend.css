@@ -5,10 +5,8 @@ body {
 	text-align: center;
 }
 
-#iCanvasContainer {
-	margin: 0 auto;
-}
-
-#iCanvas {
-	-webkit-transform: translateY(3px);
+canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
 }
