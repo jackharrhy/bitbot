@@ -1,4 +1,4 @@
-console.log("Jack, David, & Tyler's Robot\n");
+console.log("\nJack, David, & Tyler's Robot\n");
 
 var request = require('request');
 
@@ -10,7 +10,7 @@ var axis = [0,0,0];
 var arrow = [false,false,false,false];
 
 var joystick = new (require('joystick'))(0, 500, 10);
-if(joystick.domain !== null) {
+if(joystick) {
 	joystick.on('button', function(rawButton) {
 		io.sockets.emit('button', rawButton);
 		button[rawButton.number] = rawButton.value;
@@ -46,30 +46,37 @@ function url(type, val1, val2) {
 }
 
 var urlSwitch = false;
+var axis2;
 function updateAPI() {
 	urlSwitch = !urlSwitch;
 
-	if(urlSwitch && axis[1] !== 0) {
-		url('axis', 1, axis[1]);
-	} else if(axis[0] !== 0) {
-		url('axis', 0, axis[0]);
+	if(axis[2] !== axis2) {
+		axis2 = axis[2]
+		url('axis', 2, axis[2]);
 	}
 
 	for(var key in button) {
-		if(button[key] !== 0) url('button', key, 0);
+		if(button[key] !== 0) url('button', key, 0)
+
 		button[key] = 0;
 	}
 
-	if(arrow[0]) {
-		url('arrow', 0, 0);
-	} else if(arrow[1]) {
-		url('arrow', 1, 0);
+	if(urlSwitch) {
+		url('axis', 1, axis[1]);
+	} else {
+		url('axis', 0, axis[0]);
 	}
 
-	if(arrow[2]) {
-		url('arrow', 2, 0);
-	} else if(arrow[3]) {
-		url('arrow', 3, 0);
+	if(arrow[0] && !arrow[1]) {
+		url('arrow', 0, 1);
+	} else if(arrow[1] && !arrow[0]) {
+		url('arrow', 1, 1);
+	}
+
+	if(arrow[2] && !arrow[3]) {
+		url('arrow', 2, 1);
+	} else if(arrow[3] && !arrow[4]) {
+		url('arrow', 3, 1);
 	}
 
 	setTimeout(updateAPI, 100);

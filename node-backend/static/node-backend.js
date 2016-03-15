@@ -65,15 +65,47 @@ function loop() {
 			 (canvas.width/2) * axis[2],
 			 canvas.height/40);
 
+	var curColor = colors.lit;
+	if(!arrow[0]) curColor = colors.unlit;
+	rect(curColor,
+			 canvas.width / 2 - canvas.width / 40,
+			 canvas.height - ((canvas.height / 4.5) + (canvas.height/30)),
+			 canvas.width / 20,
+			 canvas.height / 20);
+	curColor = colors.lit;
+	if(!arrow[1]) curColor = colors.unlit;
+	rect(curColor,
+			 canvas.width / 2 - canvas.width / 40,
+			 canvas.height - ((canvas.height / 4.5) - (canvas.height/40)),
+			 canvas.width / 20,
+			 canvas.height / 20);
+
+	curColor = colors.lit;
+	if(!arrow[2]) curColor = colors.unlit;
+	rect(curColor,
+			 canvas.width / 2 - ((canvas.width / 40) + (canvas.height/13)),
+			 canvas.height - ((canvas.height / 4.5) - (canvas.height/40)),
+			 canvas.width / 20,
+			 canvas.height / 20);
+
+	curColor = colors.lit;
+	if(!arrow[3]) curColor = colors.unlit;
+	rect(curColor,
+			 canvas.width / 2 - ((canvas.width / 40) - (canvas.height/13)),
+			 canvas.height - ((canvas.height / 4.5) - (canvas.height/40)),
+			 canvas.width / 20,
+			 canvas.height / 20);
+
+
 	for(var i=0; i < button.length; i++) {
 		var curColor = colors.lit;
 		if(button[i] === 0) curColor = colors.unlit;
 
 		rect(curColor,
-         i * canvas.width/button.length,
+         i * canvas.width / button.length,
 				 canvas.height - canvas.height / 10,
-				 canvas.width/button.length,
-				 canvas.height/10);
+				 canvas.width / button.length,
+				 canvas.height / 10);
 	}
 
 	requestAnimationFrame(loop);
