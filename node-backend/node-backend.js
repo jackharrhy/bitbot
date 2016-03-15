@@ -1,6 +1,10 @@
 console.log("\nJack, David, & Tyler's Robot\n");
 
-var request = require('request');
+var jayson = require('jayson');
+
+var client = jayson.client.http({
+	port: 1337
+});
 
 var express = require('express');
 var app = express();
@@ -36,50 +40,23 @@ app.get('/', function(req, res) {
 var io = require('socket.io').listen(app.listen(80));
 
 var canRequest = true;
-function url(type, val1, val2) {
-	console.log(type, val1, val2);
-	if(canRequest) {
-		request('http://localhost:1337/'+type+'/'+val1+'/'+val2,
-						function() { canRequest = true; });
-	}
-	canRequest = false;
-}
+function updateAPI(err, res) {
+	if(err) throw err;
 
-var urlSwitch = false;
-var axis2;
-function updateAPI() {
-	urlSwitch = !urlSwitch;
-
-	if(axis[2] !== axis2) {
-		axis2 = axis[2]
-		url('axis', 2, axis[2]);
+	if(res) {
+		console.log(res.result);
 	}
 
-	for(var key in button) {
-		if(button[key] !== 0) url('button', key, 0)
+	var packet = [];
+	packet[0] = axis;
+	packet[1] = button;
+	packet[2] = arrow;
 
-		button[key] = 0;
-	}
-
-	if(urlSwitch) {
-		url('axis', 1, axis[1]);
-	} else {
-		url('axis', 0, axis[0]);
-	}
-
-	if(arrow[0] && !arrow[1]) {
-		url('arrow', 0, 1);
-	} else if(arrow[1] && !arrow[0]) {
-		url('arrow', 1, 1);
-	}
-
-	if(arrow[2] && !arrow[3]) {
-		url('arrow', 2, 1);
-	} else if(arrow[3] && !arrow[4]) {
-		url('arrow', 3, 1);
-	}
-
-	setTimeout(updateAPI, 100);
+	client.request(
+		'update',
+		packet,
+		updateAPI
+	);
 }
 updateAPI();
 

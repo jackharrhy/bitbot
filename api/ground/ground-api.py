@@ -8,8 +8,52 @@ from ctypes import *
 import sys, os
 
 import time
-from twisted.web import server, resource
-from twisted.internet import reactor
+
+import pyjsonrpc
+
+timeDelay = 0.1
+def delay():
+    try:
+        time.sleep(timeDelay)
+    except KeyboardInterrupt:
+        quit()
+
+axis    = []
+button  = []
+arrow   = []
+
+class RequestHandler(pyjsonrpc.HttpRequestHandler):
+    @pyjsonrpc.rpcmethod
+    def update(self, nAxis, nButton, nArrow):
+        global axis
+        global button
+        global arrow
+
+        pAxis   = axis
+        pButton = button
+        pArrow  = arrow
+
+        axis    = nAxis
+        button  = nButton
+        arrow   = nArrow
+
+        if pAxis[0] != axis[0]:
+            turn(axis[0])
+
+        if pAxis[1] != axis[1]:
+            move(axis[1])
+
+        if pAxis[2] != axis[2]:
+            acel(axis[2])
+
+        delay()
+
+        return True
+
+http_server = pyjsonrpc.ThreadingHttpServer(
+    server_address = ('localhost', 1337),
+    RequestHandlerClass = RequestHandler
+)
 
 from Phidgets.PhidgetException import *
 from Phidgets.Events.Events import *
@@ -19,8 +63,6 @@ from Phidgets.Phidget import PhidgetLogLevel
 from Phidgets.Devices.MotorControl import MotorControl
 from Phidgets.Devices.Servo import Servo, ServoTypes
 
-timeDelay = 0.005
-
 motor = MotorControl()
 servo = Servo()
 
@@ -28,12 +70,6 @@ servoMin            = None
 servoMax            = None
 servoHalf           = None
 servoReachedInitPos = False
-
-def delay():
-    try:
-        time.sleep(timeDelay)
-    except KeyboardInterrupt:
-        quit()
 
 def turn(amount):
     if servo.isAttached():
@@ -50,12 +86,11 @@ def turn(amount):
             pos = servo.getPosition()
             servo.setPosition(0,servoHalf + (amount * servoHalf))
 
-            delay()
-
 motor0 = True
 motor1 = True
 
 def move(amount):
+    print(motor.isAttached())
     if motor.isAttached():
         moveBy = float((float(amount) * 100) * -1)
 
@@ -69,63 +104,12 @@ def move(amount):
         else:
             motor.setVelocity(1, 0)
 
-        delay()
-
 def acel(amount):
-    amount = float(amount) + 1
     if motor.isAttached():
-        motor.setAcceleration(0, float(amount * 5))
+        amount = int(amount) + 1
 
-        delay()
-
-def handleAxisReq(axis, amount):
-    if axis == '0':
-        turn(amount)
-    elif axis == '1':
-        move(amount)
-    else:
-        acel(amount)
-
-    print("[@] Axis: "+axis+", Amount: "+amount+", loop #"+str(n))
-
-def handleButtonReq(button, bType):
-    button = int(button)
-    bType = int(bType)
-
-    if bType == 0:
-        global motor0
-        global motor1
-
-        if button == 2:
-            motor0 = True
-            motor1 = True
-
-        if button == 4:
-            motor0 = False
-            motor1 = True
-
-        if button == 3:
-            motor0 = True
-            motor1 = False
-    
-    print("[@] Button: "+str(button)+", type: "+str(bType)+", loop #"+str(n))
-
-class webHandle(resource.Resource):
-    isLeaf = True
-    def render_GET(self, request):
-        url = request.uri.split('/')
-        if url[1] == 'axis':
-            handleAxisReq(url[2], url[3])
-        else:
-            handleButtonReq(url[2], url[3])
-
-        return str(n)
-
-global n
-site = server.Site(webHandle())
-reactor.listenTCP(PORT, site)
-reactor.startRunning(False)
-n = 0
+        if amount != 0:
+            motor.setAcceleration(0, float(amount * 20))
 
 mName = 'Phidget High Current Motor Controller 2-motor'
 sName = None
@@ -213,12 +197,8 @@ except PhidgetException as e: LocalErrorCatcher(e)
 
 print("API @ :"+str(PORT))
 print("-----------\n")
-print("[#] Starting loop...")
 try:
-    while True:
-        n+=1
-        time.sleep(0.001)
-        reactor.iterate()
+    http_server.serve_forever()
 
 except KeyboardInterrupt:
     print(" KeyboardInterrupt")
