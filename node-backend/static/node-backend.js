@@ -1,16 +1,13 @@
-var axis = [0,0,0];
+var axis = [0,0,1];
 var button = [0,0,0,0,0,0,0,0,0,0,0];
-var arrow = [false,false,false,false];
 
 var socket = io();
-socket.on('button', function(data) { button[data.number] = data.value; });
-socket.on('axis', function(data) { axis[data.number] = data.value / 32767; });
+socket.on('button', function(data) { button[data.number] = data.value;         });
+socket.on('axis',   function(data) { axis[data.number]   = data.value / 32767; });
 
 var canvas = document.getElementById('canvas');
 var c = canvas.getContext('2d');
-c.font = '20px Arial';
 
-// 15801
 var colors = {
 	backdrop: '#86b9d8',
 	dot: '#0d8487',
@@ -34,10 +31,17 @@ function circ(color, x,y, r) {
 	c.fill();
 }
 
+function setInfo(text, id) {
+	document.getElementById(id).innerHTML = text;
+}
+
+var mode = 'Nothing';
 var frame = -1;
+
 function loop() {
-	canvas.width  = window.innerWidth;
+	canvas.width  = window.innerWidth * 0.75;
 	canvas.height = window.innerHeight;
+
 	frame++;
 
 	rect(colors.backdrop,0,0,canvas.width,canvas.height);
@@ -51,7 +55,7 @@ function loop() {
 	circ(colors.dot,
 			 (axis[0] * canvas.width/4) + canvas.width/2,
 			 (axis[1] * canvas.height/4) + (canvas.height/2 - canvas.height/30),
-			 15);
+			 canvas.height/40);
 
 	rect(colors.specialBackdrop,
 			 0,
@@ -60,42 +64,37 @@ function loop() {
 			 canvas.height/40);
 
 	rect(colors.special,
-			 canvas.width/2,
+			 0,
 			 canvas.height - (canvas.height / 10) * 1.25,
-			 (canvas.width/2) * axis[2],
+			 (canvas.width/2) * (axis[2] * -1 + 1),
 			 canvas.height/40);
 
-	var curColor = colors.lit;
-	if(!arrow[0]) curColor = colors.unlit;
-	rect(curColor,
-			 canvas.width / 2 - canvas.width / 40,
-			 canvas.height - ((canvas.height / 4.5) + (canvas.height/30)),
-			 canvas.width / 20,
-			 canvas.height / 20);
-	curColor = colors.lit;
-	if(!arrow[1]) curColor = colors.unlit;
-	rect(curColor,
-			 canvas.width / 2 - canvas.width / 40,
-			 canvas.height - ((canvas.height / 4.5) - (canvas.height/40)),
-			 canvas.width / 20,
-			 canvas.height / 20);
+	mode = 'Nothing';
 
-	curColor = colors.lit;
-	if(!arrow[2]) curColor = colors.unlit;
-	rect(curColor,
-			 canvas.width / 2 - ((canvas.width / 40) + (canvas.height/13)),
-			 canvas.height - ((canvas.height / 4.5) - (canvas.height/40)),
-			 canvas.width / 20,
-			 canvas.height / 20);
+	if(button[1]) {
+		mode = 'Vertical';
+		setInfo('M2 0: ' + String(Math.ceil(axis[1] * -100)), 'motor20vel');
+		setInfo('M2 1: ' + String(Math.ceil(axis[1] * -100)), 'motor21vel');
+	}	else if(button[2]){
+		mode = 'Horizontal';
+	} else if(button[3]) {
+		mode = 'T-Left';
+	} else if(button[4]) {
+		mode = 'T-Right';
+	} else {
+		setInfo('M1 0: 0', 'motor10vel');
+		setInfo('M1 1: 0', 'motor11vel');
+		setInfo('M2 0: 0', 'motor20vel');
+		setInfo('M2 1: 0', 'motor21vel');
+	}
+	
+	setInfo('Mode: ' + mode, 'mode');
 
-	curColor = colors.lit;
-	if(!arrow[3]) curColor = colors.unlit;
-	rect(curColor,
-			 canvas.width / 2 - ((canvas.width / 40) - (canvas.height/13)),
-			 canvas.height - ((canvas.height / 4.5) - (canvas.height/40)),
-			 canvas.width / 20,
-			 canvas.height / 20);
+	setInfo('x: ' + String(axis[0].toFixed(5)), 'x');
+	setInfo('y: ' + String(axis[1].toFixed(5)), 'y');
+	setInfo('z: ' + String(axis[2].toFixed(5)), 'z');
 
+	setInfo('Acel: ' + String(Math.ceil(((axis[2] * -1) + 1) * 50)), 'acel');
 
 	for(var i=0; i < button.length; i++) {
 		var curColor = colors.lit;
@@ -111,52 +110,3 @@ function loop() {
 	requestAnimationFrame(loop);
 }
 loop();
-
-Mousetrap.bind({
-	'1': function() { button[0]  = 1 },
-	'2': function() { button[1]  = 1 },
-	'3': function() { button[2]  = 1 },
-	'4': function() { button[3]  = 1 },
-	'5': function() { button[4]  = 1 },
-	'6': function() { button[5]  = 1 },
-	'7': function() { button[6]  = 1 },
-	'8': function() { button[7]  = 1 },
-	'9': function() { button[8]  = 1 },
-	'0': function() { button[9]  = 1 },
-	'-': function() { button[10] = 1 },
-
-	'up':    function() { arrow[0] = true },
-	'down':  function() { arrow[1] = true },
-	'left':  function() { arrow[2] = true },
-	'right': function() { arrow[3] = true }
-
-}, 'keydown');
-
-Mousetrap.bind({
-	'1': function() { button[0]  = 0 },
-	'2': function() { button[1]  = 0 },
-	'3': function() { button[2]  = 0 },
-	'4': function() { button[3]  = 0 },
-	'5': function() { button[4]  = 0 },
-	'6': function() { button[5]  = 0 },
-	'7': function() { button[6]  = 0 },
-	'8': function() { button[7]  = 0 },
-	'9': function() { button[8]  = 0 },
-	'0': function() { button[9]  = 0 },
-	'-': function() { button[10] = 0 },
-
-	'up':    function() { arrow[0] = false },
-	'down':  function() { arrow[1] = false },
-	'left':  function() { arrow[2] = false },
-	'right': function() { arrow[3] = false }
-}, 'keyup');
-
-function updateServer() {
-	socket.emit('clientControl', {
-		arrow: arrow,
-		button: button
-	});
-
-	setTimeout(updateServer, 50);
-}
-updateServer();

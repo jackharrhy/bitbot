@@ -1,13 +1,26 @@
 doctype
 html
 	head
-		title= "PWC Robotic's Club | Robot"
+		title= "Jack's Web Interface"
 		link(rel="stylesheet", href="node-backend.css")
 
 	body
 		canvas#canvas
 
+		#info
+			p#mode
+
+			#axis
+				p#x
+				p#y
+				p#z
+
+			p#motor10vel
+			p#motor11vel
+			p#motor20vel
+			p#motor21vel
+
+			p#acel
+
 		script(src="socket.io/socket.io.js")
-		script(src="mousetrap.min.js")
-		script(src="mousetrap-bind-dictionary.min.js")
 		script(src="node-backend.js")

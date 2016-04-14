@@ -2,11 +2,30 @@ body {
 	margin: 0;
 
 	font-family: Helvetica;
-	text-align: center;
+	font-size: 1.75em;
 }
 
 canvas {
 	position: absolute;
 	top: 0;
+	left: 25%;
+	width: 75%;
+}
+
+#axis {
+	padding-top: 0.25em;
+	padding-bottom: 0.25em;
+	background-color: black;
+	color: white;
+}
+
+p {
+	margin: 0.25em;
+}
+
+#info {
+	position: absolute;
+	top: 0;
 	left: 0;
+	width: 25%;
 }

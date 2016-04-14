@@ -1,4 +1,4 @@
-console.log("\nJack, David, & Tyler's Robot\n");
+console.log("\nJack's \n");
 
 var jayson = require('jayson');
 
@@ -11,7 +11,6 @@ var app = express();
 
 var button = [0,0,0,0,0,0,0,0,0,0,0];
 var axis = [0,0,0];
-var arrow = [false,false,false,false];
 
 var joystick = new (require('joystick'))(0, 500, 10);
 if(joystick) {
@@ -39,35 +38,27 @@ app.get('/', function(req, res) {
 
 var io = require('socket.io').listen(app.listen(80));
 
-var canRequest = true;
 function updateAPI(err, res) {
-	if(err) throw err;
-
-	if(res) {
-		console.log(res.result);
-	}
+	if(err) console.log(err);
 
 	var packet = [];
 	packet[0] = axis;
 	packet[1] = button;
-	packet[2] = arrow;
 
 	client.request(
 		'update',
 		packet,
 		updateAPI
 	);
-}
-updateAPI();
 
-io.sockets.on('connection', function (socket) {
-	socket.on('clientControl', function(data) {
-		arrow = data.arrow;
-		for(var key in button) {
-			if(data.button[key] !== 0) button[key] = 1;
-		}
-	});
-});
+	try {
+		resp = res.result;
+		console.log(resp);
+	} catch(err) {
+		console.log(err);
+	}
+}
+updateAPI(undefined, { result: 'init' });
 
 console.log("[%] Web Interface @ 127.0.0.1:80");
 console.log("--------------------------------\n");
