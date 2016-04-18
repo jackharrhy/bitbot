@@ -77,10 +77,26 @@ function loop() {
 		setInfo('M2 1: ' + String(Math.ceil(axis[1] * -100)), 'motor21vel');
 	}	else if(button[2]){
 		mode = 'Horizontal';
+		setInfo('M1 0: ' + String(Math.ceil(axis[1] * -100)), 'motor10vel');
+		setInfo('M1 1: ' + String(Math.ceil(axis[1] * -100)), 'motor11vel');
 	} else if(button[3]) {
 		mode = 'T-Left';
+		if(axis[0] < 0) {
+			setInfo('M1 0: ' + String(Math.ceil(axis[0] * -100)), 'motor10vel');
+			setInfo('M1 1: ' + String(Math.ceil(axis[0] * 100)), 'motor11vel');
+		} else {
+			setInfo('M1 0: 0', 'motor10vel');
+			setInfo('M1 1: 0', 'motor11vel');
+		}
 	} else if(button[4]) {
 		mode = 'T-Right';
+		if(axis[0] > 0) {
+			setInfo('M1 0: ' + String(Math.ceil(axis[0] * 100)), 'motor10vel');
+			setInfo('M1 1: ' + String(Math.ceil(axis[0] * -100)), 'motor11vel');
+		} else {
+			setInfo('M1 0: 0', 'motor10vel');
+			setInfo('M1 1: 0', 'motor11vel');
+		}
 	} else {
 		setInfo('M1 0: 0', 'motor10vel');
 		setInfo('M1 1: 0', 'motor11vel');

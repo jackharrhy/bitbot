@@ -1,2 +1,5 @@
+*.pyc
+__pycache__/
+
 examples/
 node_modules/

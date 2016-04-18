@@ -24,10 +24,13 @@ from Phidgets.PhidgetException import *
 from Phidgets.Events.Events import *
 from Phidgets.Manager import Manager
 from Phidgets.Phidget import PhidgetLogLevel
-from Phidgets.Devices.MotorControl import MotorControl
 
+from Phidgets.Devices.MotorControl import MotorControl
 motor1 = MotorControl()
 motor2 = MotorControl()
+
+from Phidgets.Devices.AdvancedServo import AdvancedServo
+servo = AdvancedServo()
 
 def vertical(axis):
     motor2.setVelocity(0, axis[1] * -100)
@@ -36,9 +39,15 @@ def horizontal(axis):
     motor1.setVelocity(0, axis[1] * -100)
     motor1.setVelocity(1, axis[1] * -100)
 def tLeft(axis):
-    motor1.setVelocity(0, (axis[1] * -100))
-    motor1.setVelocity(1, (axis[1] * -100))
+    if axis[0] > 0:
+        motor1.setVelocity(0, (axis[0] * -100))
+        motor1.setVelocity(1, (axis[0] * 100))
 def tRight(axis):
+    if axis[0] < 0:
+        motor1.setVelocity(0, (axis[0] * 100))
+        motor1.setVelocity(1, (axis[0] * -100))
+
+def arm(axis):
     pass
 
 def move(axis, button):

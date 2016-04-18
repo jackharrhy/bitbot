@@ -1,1 +1,1 @@
-sudo nodejs node-backend.js
+sudo node node-backend.js
