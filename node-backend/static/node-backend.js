@@ -71,7 +71,10 @@ function loop() {
 
 	mode = 'Nothing';
 
-	if(button[1]) {
+	if(button[0]) {
+		mode = 'Arm';
+		setInfo('S Pos: ' + String(Math.ceil(axis[1] * -100)), 'servoPos');
+	} else if(button[1]) {
 		mode = 'Vertical';
 		setInfo('M2 0: ' + String(Math.ceil(axis[1] * -100)), 'motor20vel');
 		setInfo('M2 1: ' + String(Math.ceil(axis[1] * -100)), 'motor21vel');
@@ -100,8 +103,7 @@ function loop() {
 	} else {
 		setInfo('M1 0: 0', 'motor10vel');
 		setInfo('M1 1: 0', 'motor11vel');
-		setInfo('M2 0: 0', 'motor20vel');
-		setInfo('M2 1: 0', 'motor21vel');
+		setInfo(document.getElementById('servoPos').innerHTML, 'servoPos');
 	}
 	
 	setInfo('Mode: ' + mode, 'mode');

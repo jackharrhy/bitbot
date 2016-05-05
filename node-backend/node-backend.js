@@ -36,7 +36,7 @@ app.get('/', function(req, res) {
 	res.render('index');
 });
 
-var io = require('socket.io').listen(app.listen(80));
+var io = require('socket.io').listen(app.listen(2424));
 
 function updateAPI(err, res) {
 	if(err) console.log(err);
@@ -60,5 +60,5 @@ function updateAPI(err, res) {
 }
 updateAPI(undefined, { result: 'init' });
 
-console.log("[%] Web Interface @ 127.0.0.1:80");
-console.log("--------------------------------\n");
+console.log("[%] Web Interface @ 127.0.0.1:2424");
+console.log("-----------------------------------\n");
