@@ -3,6 +3,7 @@ console.log("\nJack's \n");
 var jayson = require('jayson');
 
 var client = jayson.client.http({
+	hostname: '127.0.0.1',
 	port: 1337
 });
 

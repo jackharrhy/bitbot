@@ -18,7 +18,7 @@ class RequestHandler(pyjsonrpc.HttpRequestHandler):
         return True
 
 http_server = pyjsonrpc.ThreadingHttpServer(
-    server_address = ('localhost', 1337),
+    server_address = ('127.0.0.1', 1337),
     RequestHandlerClass = RequestHandler
 )
 
@@ -67,35 +67,63 @@ def vertical(axis):
 def horizontal(axis):
     motor1.setVelocity(0, axis[1] * -100)
     motor1.setVelocity(1, axis[1] * -100)
+
+def topRight(axis):
+    motor2.setVelocity(0, axis[1] * -100)
+def topLeft(axis):
+    motor2.setVelocity(1, axis[1] * -100)
+
 def tLeft(axis):
     if axis[0] < 0:
         motor1.setVelocity(0, (axis[0] * -100))
         motor1.setVelocity(1, (axis[0] * 100))
 def tRight(axis):
     if axis[0] > 0:
-        motor1.setVelocity(0, (axis[0] * 100))
-        motor1.setVelocity(1, (axis[0] * -100))
+        motor1.setVelocity(0, (axis[0] * -100))
+        motor1.setVelocity(1, (axis[0] * 100))
+
+def left(axis):
+    motor1.setVelocity(0, axis[1] * -100)
+def right(axis):
+    motor1.setVelocity(1, axis[1] * -100)
 
 def arm(axis):
-    if not servo.getEngaged(0):
-        servo.setEngaged(0, True)
+    if not servo.getEngaged(4):
+        servo.setEngaged(4, True)
     else:
-        servo.setPosition(0, config.servoHalf - (axis[1] * servoHalf))
+        servoHalf = servo.getPositionMax(4) / 2
+        servo.setPosition(4, servoHalf - (axis[1] * servoHalf))
 
 def move(axis, button):
     if motor1.isAttached():
+        shouldZero = True
         if button[2]:
             horizontal(axis)
-        elif button[3]:
+            shouldZero = False
+        if button[3]:
             tLeft(axis)
-        elif button[4]:
+            shouldZero = False
+        if button[4]:
             tRight(axis)
-        else:
+            shouldZero = False
+        if button[6]:
+            left(axis)
+            shouldZero = False
+        if button[9]:
+            right(axis)
+            shouldZero = False
+
+        if shouldZero:
             horizontal([0,0,0])
 
     if motor2.isAttached():
         if button[1]:
             vertical(axis)
+
+        if button[5]:
+            topRight(axis)
+        if button[10]:
+            topLeft(axis)
 
 def turn(axis, button):
     if servo.isAttached():

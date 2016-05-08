@@ -1,5 +1,4 @@
-var axis = [0,0,1];
-var button = [0,0,0,0,0,0,0,0,0,0,0];
+var axis = [0,0,1]; var button = [0,0,0,0,0,0,0,0,0,0,0];
 
 var socket = io();
 socket.on('button', function(data) { button[data.number] = data.value;         });
@@ -39,7 +38,7 @@ var mode = 'Nothing';
 var frame = -1;
 
 function loop() {
-	canvas.width  = window.innerWidth * 0.75;
+	canvas.width  = window.innerWidth * 0.5;
 	canvas.height = window.innerHeight;
 
 	frame++;
@@ -69,44 +68,65 @@ function loop() {
 			 (canvas.width/2) * (axis[2] * -1 + 1),
 			 canvas.height/40);
 
-	mode = 'Nothing';
+	mode = '';
 
 	if(button[0]) {
-		mode = 'Arm';
-		setInfo('S Pos: ' + String(Math.ceil(axis[1] * -100)), 'servoPos');
-	} else if(button[1]) {
-		mode = 'Vertical';
-		setInfo('M2 0: ' + String(Math.ceil(axis[1] * -100)), 'motor20vel');
-		setInfo('M2 1: ' + String(Math.ceil(axis[1] * -100)), 'motor21vel');
-	}	else if(button[2]){
-		mode = 'Horizontal';
-		setInfo('M1 0: ' + String(Math.ceil(axis[1] * -100)), 'motor10vel');
-		setInfo('M1 1: ' + String(Math.ceil(axis[1] * -100)), 'motor11vel');
-	} else if(button[3]) {
-		mode = 'T-Left';
-		if(axis[0] < 0) {
-			setInfo('M1 0: ' + String(Math.ceil(axis[0] * -100)), 'motor10vel');
-			setInfo('M1 1: ' + String(Math.ceil(axis[0] * 100)), 'motor11vel');
-		} else {
-			setInfo('M1 0: 0', 'motor10vel');
-			setInfo('M1 1: 0', 'motor11vel');
-		}
-	} else if(button[4]) {
-		mode = 'T-Right';
-		if(axis[0] > 0) {
-			setInfo('M1 0: ' + String(Math.ceil(axis[0] * 100)), 'motor10vel');
-			setInfo('M1 1: ' + String(Math.ceil(axis[0] * -100)), 'motor11vel');
-		} else {
-			setInfo('M1 0: 0', 'motor10vel');
-			setInfo('M1 1: 0', 'motor11vel');
-		}
-	} else {
-		setInfo('M1 0: 0', 'motor10vel');
-		setInfo('M1 1: 0', 'motor11vel');
-		setInfo(document.getElementById('servoPos').innerHTML, 'servoPos');
+		mode += 'Arm ';
+		setInfo('Servo Pos: ' + String(Math.ceil(axis[1] * -100)), 'servoPos');
 	}
 	
-	setInfo('Mode: ' + mode, 'mode');
+	if(button[1]) {
+		mode += 'Vertical ';
+		setInfo('Motor2 0: ' + String(Math.ceil(axis[1] * -100)), 'motor20vel');
+		setInfo('Motor2 1: ' + String(Math.ceil(axis[1] * -100)), 'motor21vel');
+	}
+
+	if(button[5]) {
+		mode += 'Vertical-0 ';
+		setInfo('Motor2 0: ' + String(Math.ceil(axis[1] * -100)), 'motor20vel');
+	}
+	if(button[10]) {
+		mode += 'Vertical-1 ';
+		setInfo('Motor2 1: ' + String(Math.ceil(axis[1] * -100)), 'motor21vel');
+	}
+	if(button[6]) {
+		mode += 'Horizontal-0 ';
+		setInfo('Motor1 0: ' + String(Math.ceil(axis[1] * -100)), 'motor10vel');
+	}
+	if(button[9]) {
+		mode += 'Horizontal-1 ';
+		setInfo('Motor1 1: ' + String(Math.ceil(axis[1] * -100)), 'motor11vel');
+	}
+	
+	if(button[2]) {
+		mode += 'Horizontal ';
+		setInfo('Motor1 0: ' + String(Math.ceil(axis[1] * -100)), 'motor10vel');
+		setInfo('Motor1 1: ' + String(Math.ceil(axis[1] * -100)), 'motor11vel');
+	}
+	
+	if(button[3]) {
+		mode += 'T-Left ';
+		if(axis[0] <= 0) {
+			setInfo('Motor1 0: ' + String(Math.ceil(axis[0] * 100)), 'motor10vel');
+			setInfo('Motor1 1: ' + String(Math.ceil(axis[0] * -100)), 'motor11vel');
+		}
+	} else if(!button[4] && !button[2] && !button[6] && !button[9]) {
+		setInfo('Motor1 0: 0', 'motor10vel');
+		setInfo('Motor1 1: 0', 'motor11vel');
+	}
+
+	if(button[4]) {
+		mode += 'T-Right';
+		if(axis[0] >= 0) {
+			setInfo('Motor1 0: ' + String(Math.ceil(axis[0] * 100)), 'motor10vel');
+			setInfo('Motor1 1: ' + String(Math.ceil(axis[0] * -100)), 'motor11vel');
+		}
+	} else if(!button[3] && !button[2] && !button[6] && !button[9]) {
+		setInfo('Motor1 0: 0', 'motor10vel');
+		setInfo('Motor1 1: 0', 'motor11vel');
+	}
+
+	setInfo('Mode(s): ' + mode, 'mode');
 
 	setInfo('x: ' + String(axis[0].toFixed(5)), 'x');
 	setInfo('y: ' + String(axis[1].toFixed(5)), 'y');

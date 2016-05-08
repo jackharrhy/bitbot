@@ -8,21 +8,25 @@ html
 		canvas#canvas
 
 		#info
-			p#mode Mode: ?
 
 			#axis
 				p#x x: ?
 				p#y y: ?
 				p#z z: ?
+		
+			p#mode Mode: ?
 
-			p#motor10vel M1 0: ?
-			p#motor11vel M1 1: ?
-			p#motor20vel M2 0: ?
-			p#motor21vel M2 1: ?
+			p#motor10vel Motor1 0: ?
+			p#motor11vel Motor1 1: ?
 
-			p#servoPos S Pos: ?
+			br
 
-			p#acel
+			p#motor20vel Motor2 0: ?
+			p#motor21vel Motor2 1: ?
+
+			p#servoPos Servo Pos: ?
+
+			p#acel Acel: ?
 
 		script(src="socket.io/socket.io.js")
 		script(src="node-backend.js")
