@@ -1,0 +1,57 @@
+#cameraFeed {
+	position: absolute;
+	margin: 0;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+}
+
+#servoDiv, #motorDiv {
+	position: absolute;
+	margin: 0;
+	top: 0;
+	left: 0;
+}
+
+#servoDiv {
+	top: 75%;
+	left: 3%;
+	width: 40%;
+	height: 10%;
+}
+#motorDiv {
+	top: 5%;
+	left: 85%;
+	width: 10%;
+	height: 90%;
+}
+
+#servoRange, #motorRange {
+	margin: 0;
+	width: 100%;
+	height: 100%;
+}
+#motorRange {
+	-webkit-appearance: slider-vertical;
+}
+
+input[type=range].slider::-webkit-slider-runnable-track {
+	box-shadow: 1.9px 1.9px 0.9px rgba(0, 0, 0, 0.28), 0px 0px 1.9px rgba(13, 13, 13, 0.28);
+}
+
+input[type=range].verSlider::-webkit-slider-runnable-track {
+	background: #6be05e;
+	background: -moz-linear-gradient(top,  #6be05e 0%, #353535 40%, #353535 60%, #ce3b3b 100%);
+	background: -webkit-linear-gradient(top,  #6be05e 0%,#353535 40%,#353535 60%,#ce3b3b 100%);
+	background: linear-gradient(to bottom,  #6be05e 0%,#353535 40%,#353535 60%,#ce3b3b 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6be05e', endColorstr='#ce3b3b',GradientType=0 );
+}
+
+input[type=range].horSlider::-webkit-slider-runnable-track {
+	background: #4789e5;
+	background: -moz-linear-gradient(left,  #4789e5 0%, #353535 40%, #353535 60%, #edce44 100%);
+	background: -webkit-linear-gradient(left,  #4789e5 0%,#353535 40%,#353535 60%,#edce44 100%);
+	background: linear-gradient(to right,  #4789e5 0%,#353535 40%,#353535 60%,#edce44 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4789e5', endColorstr='#edce44',GradientType=1 );
+}
