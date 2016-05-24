@@ -28,7 +28,7 @@ function update() {
 		motorVal, motorVal
 	];
 	var outputs = [
-		false,false,false,false,false,false,false
+		false,false,false,false,false,false,false,false
 	];
 
 	socket.emit('update', servos, motors, outputs);

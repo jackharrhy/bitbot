@@ -8,25 +8,30 @@ motors = [0] * 2
 servos = [0] * 8
 outputs = [False] * 8
 
-import pyjsonrpc
-class RequestHandler(pyjsonrpc.HttpRequestHandler):
-    @pyjsonrpc.rpcmethod
-    def update(self, nServos, nMotors, nOutputs):
+num = -1
 
-        global motors
-        if motors != nMotors:
-            print(nMotors)
+import zerorpc
+class rpc(object):
+    def update(self, data):
+        dataSplit = data.split(",")
 
-        if motors != nMotors and motorC.isAttached():
-            for i in range(0,len(nMotors)):
-                if motors[i] != nMotors[i]:
-                    motorC.setVelocity(i, nMotors[i])
+        global num
+        num += 1
+
+        nServos = dataSplit[0:8]
+        nMotors = dataSplit[8:10]
+        nOutputs = dataSplit[10:18]
 
         global servos
         if servos != nServos and servoC.isAttached():
             for i in range(0,len(nServos)):
                 if servos[i] != nServos[i]:
                     servoC.setPosition(i, nMotors[i])
+
+        if motors != nMotors and motorC.isAttached():
+            for i in range(0,len(nMotors)):
+                if motors[i] != nMotors[i]:
+                    motorC.setVelocity(i, nMotors[i])
 
         global outputs
         if outputs != nOutputs and interC.isAttached():
@@ -39,11 +44,6 @@ class RequestHandler(pyjsonrpc.HttpRequestHandler):
         outputs = nOutputs
 
         return True
-
-http_server = pyjsonrpc.ThreadingHttpServer(
-    server_address = (config.myAddress, config.myPort),
-    RequestHandlerClass = RequestHandler
-)
 
 from Phidgets.PhidgetException import *
 from Phidgets.Events.Events import *
@@ -129,7 +129,9 @@ manager.openManager()
 
 print("phidAPI @ :"+str(config.myPort))
 try:
-    http_server.serve_forever()
+    s = zerorpc.Server(rpc())
+    s.bind("tcp://0.0.0.0:4242")
+    s.run()
 
 except KeyboardInterrupt:
     print(" KeyboardInterrupt")

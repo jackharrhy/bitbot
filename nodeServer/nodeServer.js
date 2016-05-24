@@ -1,8 +1,6 @@
-var jayson = require("jayson");
-var client = jayson.client.http({
-	hostname: "127.0.0.1",
-	port: 2424
-});
+var zerorpc = require("zerorpc");
+var client = new zerorpc.Client();
+client.connect("tcp://127.0.0.1:4242");
 
 var express = require("express");
 var app = express();
@@ -30,11 +28,10 @@ var io = require("socket.io").listen(app.listen(1337));
 io.on("connection", function(socket) {
 
 	socket.on("update", function(servos, motors, outputs) {
-		var packet = [servos, motors, outputs];
-
-		client.request('update', packet, function(err, resp) {});
+		client.invoke("update", String([servos, motors, outputs]));
 	});
 
 });
+
 
 console.log("nodeServer @ 127.0.0.1:1337");
