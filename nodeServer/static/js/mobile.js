@@ -4,11 +4,12 @@ var servoRange = document.getElementById('servoRange');
 var motorRange = document.getElementById('motorRange');
 
 var delay = 50;
+var oldPacket = '';
 
 function update() {
 	var servoVal = parseInt(servoRange.value);
 	var motorVal = parseInt(motorRange.value);
-	
+
 	if(motorVal > 140) {
 		motorVal -= 140;
 	}
@@ -18,6 +19,8 @@ function update() {
 	else {
 		motorVal = 0;
 	}
+
+	motorVal *= -1;
 
 	// TODO Servo logic
 
@@ -31,16 +34,23 @@ function update() {
 		false,false,false,false,false,false,false,false
 	];
 
-	socket.emit('update', servos, motors, outputs);
+	var packet = String([servos, motors, outputs]);
+
+	if(packet !== oldPacket) {
+		socket.emit('update', packet);
+	}
+
+	oldPacket = packet;
 
 	setTimeout(update, delay);
 }
 update();
 
-cameraDelay = 1000/10;
+cameraDelay = 1000/25;
 function cameraUpdate() {
-	document.getElementById('cameraFeed').src = "http://192.168.1.51:81/?action=static#" + new Date().getTime();	
+	document.getElementById('cameraFeed').src = "feed.jpg#" + new Date().getTime();
 
 	setTimeout(cameraUpdate, cameraDelay);
 }
 cameraUpdate();
+

@@ -8,15 +8,10 @@ motors = [0] * 2
 servos = [0] * 8
 outputs = [False] * 8
 
-num = -1
-
 import zerorpc
 class rpc(object):
     def update(self, data):
         dataSplit = data.split(",")
-
-        global num
-        num += 1
 
         nServos = dataSplit[0:8]
         nMotors = dataSplit[8:10]
@@ -28,10 +23,10 @@ class rpc(object):
                 if servos[i] != nServos[i]:
                     servoC.setPosition(i, nMotors[i])
 
+        global motors
         if motors != nMotors and motorC.isAttached():
-            for i in range(0,len(nMotors)):
-                if motors[i] != nMotors[i]:
-                    motorC.setVelocity(i, nMotors[i])
+            motorC.setVelocity(0, nMotors[0])
+            motorC.setVelocity(1, nMotors[1])
 
         global outputs
         if outputs != nOutputs and interC.isAttached():
@@ -77,10 +72,10 @@ def AttachHandler(e):
 
     if serial == config.motorSerial:
         print('   - Connecting motor | ' + str(serial))
-        global motorCC
-        motorC.setOnInputChangeHandler(motorCInpChange)
-        motorC.setOnCurrentChangeHandler(motorCCurChange)
-        motorC.setOnVelocityChangeHandler(motorCVelChange)
+        global motorC
+        #motorC.setOnInputChangeHandler(motorCInpChange)
+        #motorC.setOnCurrentChangeHandler(motorCCurChange)
+        #motorC.setOnVelocityChangeHandler(motorCVelChange)
         motorC.openPhidget(serial)
     elif serial == config.servoSerial:
         print('   - Connecting servo | ' + str(serial))
@@ -125,12 +120,12 @@ manager.setOnDetachHandler(DetachHandler)
 manager.setOnServerConnectHandler(ConnectHandler)
 manager.setOnServerDisconnectHandler(DisconnectHandler)
 
-manager.openManager()
+manager.openRemoteIP(config.SBCIP, 5001)
 
 print("phidAPI @ :"+str(config.myPort))
 try:
     s = zerorpc.Server(rpc())
-    s.bind("tcp://0.0.0.0:4242")
+    s.bind("tcp://" + str(config.myIP) + ":" + str(config.myPort))
     s.run()
 
 except KeyboardInterrupt:

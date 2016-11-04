@@ -1,6 +1,10 @@
+var config = require("./config");
+
 var zerorpc = require("zerorpc");
 var client = new zerorpc.Client();
-client.connect("tcp://127.0.0.1:4242");
+client.connect("tcp://"+ config.piIP +":"+ String(config.piPort));
+
+var MjpegProxy = require('mjpeg-proxy').MjpegProxy;
 
 var express = require("express");
 var app = express();
@@ -17,21 +21,20 @@ app.get("/", function(req, res) {
 	res.render("index");
 });
 
+app.get('/feed.jpg', new MjpegProxy(config.cameraAddress).proxyRequest);
+
 app.get("/mobile", function(req, res) {
-	res.render("mobile", {
-		cameraStatic: "http://192.168.1.51:81/?action=static"
-	});
+	res.render("mobile");
 });
 
-var io = require("socket.io").listen(app.listen(1337));
+var io = require("socket.io").listen(app.listen(config.port));
 
 io.on("connection", function(socket) {
 
-	socket.on("update", function(servos, motors, outputs) {
-		client.invoke("update", String([servos, motors, outputs]));
+	socket.on("update", function(packet) {
+		client.invoke("update", packet);
 	});
 
 });
 
-
-console.log("nodeServer @ 127.0.0.1:1337");
+console.log("nodeServer @ localhost:" + String(config.port));
